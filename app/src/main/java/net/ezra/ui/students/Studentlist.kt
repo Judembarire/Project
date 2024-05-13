@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -24,9 +25,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavHostController
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+
 import androidx.lifecycle.ViewModel
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
+import net.ezra.navigation.ROUTE_ADD
 import net.ezra.navigation.ROUTE_HOME
 
 
@@ -35,18 +38,17 @@ data class Item(
 
     val imageUrl: String? = "",
     val studentName: String? = "",
-    val phone: String? = "",
-    val email: String? = "",
     val studentClass: String? = "",
-    val comments: String? = "",
+    val email: String? = "",
+    val phone: String? = "",
 
-)
+    )
 
 
 class FirestoreViewModel : ViewModel() {
 
     private val firestore = Firebase.firestore
-    private val itemsCollection = firestore.collection("Clients")
+    private val itemsCollection = firestore.collection("Students")
 
     private val _items = MutableLiveData<List<Item>>()
     val items: LiveData<List<Item>> = _items
@@ -75,16 +77,16 @@ class FirestoreViewModel : ViewModel() {
 }
 
 
-
 @Composable
 fun ItemList(items: List<Item>) {
 
     Column {
 
+        Text(text = "Student List")
 
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(3),
             modifier = Modifier
                 .padding(10.dp)
         ) {
@@ -108,9 +110,6 @@ fun ItemList(items: List<Item>) {
                         )
 
                         item.studentName?.let { Text(text = it) }
-                        item.phone?.let { Text(text = it) }
-                        item.email?.let { Text(text = it) }
-                        item.comments?.let { Text(text = it) }
                         item.studentClass?.let { Text(text = it) }
 
                     }
@@ -120,13 +119,9 @@ fun ItemList(items: List<Item>) {
 
 
         }
-
-
-
-
-
     }
 }
+
 
 @Composable
 fun StudentList(navController: NavHostController, viewModel: FirestoreViewModel) {
@@ -142,6 +137,9 @@ fun StudentList(navController: NavHostController, viewModel: FirestoreViewModel)
         Text(
             modifier = Modifier
                 .clickable {
+                    navController.navigate(ROUTE_HOME) {
+                        popUpTo(ROUTE_ADD) { inclusive = true }
+                    }
                 },
             text = "go home",
             textAlign = TextAlign.Center,
@@ -156,6 +154,7 @@ fun StudentList(navController: NavHostController, viewModel: FirestoreViewModel)
 
 
 }
+
 
 
 
